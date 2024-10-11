@@ -1,0 +1,42 @@
+services:
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      - POSTGRES_DB=vacationtracker
+      - POSTGRES_PASSWORD=mm12345!
+      - POSTGRES_USER=postgres
+    ports:
+      - 5432
+    volumes:
+      - /Users/milanmitreski/PostgreSQL:/var/lib/postgresql/data
+  backend-employee:
+    build:
+      context: ../VacationTrackerEmployee
+    container_name: vacationemployee
+    ports:
+      - 8082:8082
+    depends_on:
+      - db
+    environment:
+      spring.datasource.url: jdbc:postgresql://db:5432/vacationtracker
+      spring.datasource.username: postgres
+      spring.datasource.password: mm12345!
+      spring.datasource.driver-class-name: org.postgresql.Driver
+      spring.session.jdbc.table-name: SPRING_SESSION
+    restart: always
+  backend-admin:
+    build:
+      context: .
+    container_name: vacationtracker
+    ports:
+      - 8081:8081
+    depends_on:
+      - db
+    environment:
+      spring.datasource.url: jdbc:postgresql://db:5432/vacationtracker
+      spring.datasource.username: postgres
+      spring.datasource.password: mm12345!
+      spring.datasource.driver-class-name: org.postgresql.Driver
+      spring.session.jdbc.table-name: SPRING_SESSION
+    restart: always
